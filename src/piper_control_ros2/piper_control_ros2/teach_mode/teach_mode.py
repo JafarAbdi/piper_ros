@@ -13,6 +13,7 @@ freely.
 from typing import Mapping, Sequence
 import dataclasses
 import json
+import mujoco
 
 import numpy as np
 
@@ -45,13 +46,8 @@ class _SimGravityTorquePrediction:
       model_path: str,
       grav_comp_params: Mapping[int, Sequence[float]],
   ):
-    # JIT import of mujoco to not force mujoco install for piper_ros users that
-    # done use teach mode functionality.
-    import mujoco
-
     self._model = mujoco.MjModel.from_xml_path(model_path)
     self._data = mujoco.MjData(self._model)
-    self._mj_forward_fn = mujoco.mj_forward
 
     self._grav_comp_params = grav_comp_params
 
@@ -66,7 +62,7 @@ class _SimGravityTorquePrediction:
       self._data.qvel[:] = 0.0
 
     # Propagate the changes through the simulation
-    self._mj_forward_fn(self._model, self._data)
+    mujoco.mj_forward(self._model, self._data)
     result = [self._data.qfrc_bias[ji] for ji in self._joint_ids]
 
     for i, predicted_torque in enumerate(result):
