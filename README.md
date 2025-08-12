@@ -32,3 +32,26 @@ pixi install
       ```bash
       pip install .
       ```
+
+### CAN udev Rule Generator
+
+Automatically rename CAN interfaces and set bitrate on plug-in.
+
+#### Usage
+
+1. Plug in your CAN adapter
+2. Run the script:
+   ```bash
+   sudo ./scripts/generate_udev_rule.bash -i can0 -b 1000000
+   # Or
+   sudo ./scripts/generate_udev_rule.bash -i can0 -n myrobot -b 1000000
+   ```
+3. Unplug and replug the adapter to test
+
+#### Test
+
+```bash
+ip link show myrobot
+```
+
+That's it!
