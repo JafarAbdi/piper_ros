@@ -144,21 +144,7 @@ chmod 644 "$UDEV_RULE_FILE"
 
 # Reload udev rules
 info "Reloading udev rules..."
-udevadm control --reload-rules
-if [ $? -eq 0 ]; then
-    info "✓ Udev rules reloaded successfully"
-else
-    error "Failed to reload udev rules"
-fi
-
-# Trigger udev
-info "Triggering udev..."
-udevadm trigger
-if [ $? -eq 0 ]; then
-    info "✓ Udev triggered successfully"
-else
-    error "Failed to trigger udev"
-fi
+sudo udevadm control --reload-rules && sudo udevadm trigger
 
 info ""
 info "Setup complete! Your CAN interface should now be available as '$DESIRED_NAME'"
