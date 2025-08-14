@@ -39,12 +39,13 @@ usage() {
 BITRATE="1000000"
 CAN_INTERFACE=""
 DESIRED_NAME=""
+RENAME_INTERFACE=false
 
 # Parse arguments using getopts
 while getopts "i:n:b:h" opt; do
     case $opt in
         i) CAN_INTERFACE="$OPTARG" ;;
-        n) DESIRED_NAME="$OPTARG" ;;
+        n) DESIRED_NAME="$OPTARG"; RENAME_INTERFACE=true ;;
         b) BITRATE="$OPTARG" ;;
         h) usage ;;
         \?) error "Invalid option: -$OPTARG. Use -h for help." ;;
@@ -117,9 +118,13 @@ if [ -z "$VENDOR" ] || [ -z "$PRODUCT" ] || [ -z "$SERIAL" ]; then
 All three are required for a reliable udev rule."
 fi
 
-# Generate udev rule content with all identifiers
+# Generate udev rule content with conditional NAME attribute
 info "Creating rule with vendor, product, and serial for unique identification"
-UDEV_RULE="SUBSYSTEM==\"net\", ATTRS{idVendor}==\"$VENDOR\", ATTRS{idProduct}==\"$PRODUCT\", ATTRS{serial}==\"$SERIAL\", ACTION==\"add\", NAME=\"$DESIRED_NAME\", RUN+=\"/bin/sh -c 'ip link set $DESIRED_NAME down; ip link set $DESIRED_NAME type can bitrate $BITRATE; ip link set $DESIRED_NAME up'\""
+if [ "$RENAME_INTERFACE" = true ]; then
+    UDEV_RULE="SUBSYSTEM==\"net\", ATTRS{idVendor}==\"$VENDOR\", ATTRS{idProduct}==\"$PRODUCT\", ATTRS{serial}==\"$SERIAL\", ACTION==\"add\", NAME=\"$DESIRED_NAME\", RUN+=\"/bin/sh -c 'ip link set $DESIRED_NAME down; ip link set $DESIRED_NAME type can bitrate $BITRATE; ip link set $DESIRED_NAME up'\""
+else
+    UDEV_RULE="SUBSYSTEM==\"net\", ATTRS{idVendor}==\"$VENDOR\", ATTRS{idProduct}==\"$PRODUCT\", ATTRS{serial}==\"$SERIAL\", ACTION==\"add\", RUN+=\"/bin/sh -c 'ip link set \$env{INTERFACE} down; ip link set \$env{INTERFACE} type can bitrate $BITRATE; ip link set \$env{INTERFACE} up'\""
+fi
 
 # Define the udev rule file path
 UDEV_RULE_FILE="/etc/udev/rules.d/99-can-$DESIRED_NAME.rules"
