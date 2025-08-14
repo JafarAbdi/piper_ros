@@ -17,6 +17,13 @@ ros-jazzy-desktop = ">=0.11.0,<0.12"
 
 [pypi-dependencies]
 piper_control           = { git = "https://github.com/Reimagine-Robotics/piper_control/", branch = "main" }
-piper_ros               = { path = ".", editable = true }
+piper_ros               = { path = ".", editable = true, extras = ["dev"] }
 piper_control_ros2      = { path = "src/piper_control_ros2", editable = true }
 piper_puppeteering_node = { path = "src/piper_puppeteering_node", editable = true }
+piper_sdk               = { git = "https://github.com/JafarAbdi/piper_sdk", branch = "master" }
+python-can              = { version = ">=3.0.0,<4" }
+more-itertools = ">=10.7.0, <11"
+
+[pypi-options.dependency-overrides]
+# piper_control & ROS 2 depend on numpy<2
+numpy = "<2.0.0"

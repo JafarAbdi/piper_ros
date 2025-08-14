@@ -7,21 +7,36 @@ requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE"]
 dependencies = [
-    "numpy",
-    "r2-transformations",
-    "piper_control>=1.1.2",
-    "piper_sdk>=0.2.19",
-    "mujoco",
+  "numpy",
+  "r2-transformations",
+  "piper_control>=1.1.2",
+  "piper_sdk>=0.2.19",
+  "mujoco",
+  "nicegui",
+  "loop-rate-limiters",
+  "scikit-learn",
+  "seaborn",
 ]
 
 [project.urls]
 Repository = "https://github.com/Reimagine-Robotics/piper_ros"
 
 [project.optional-dependencies]
+dev = [
+  "robot-descriptions>=1.20.0",
+  "viser>=1.0.0",
+  "pin>=3.7.0",
+  "toppra >= 0.6.3",
+  "jupyterlab",
+  "ipympl",
+  "ipywidgets>=8.1.7,<9",
+  "jupyterlab-widgets",
+  "mediapy",
+]
 test = ["pytest"]
 
 [build-system]
-requires = ["setuptools", "wheel"]
+requires      = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
