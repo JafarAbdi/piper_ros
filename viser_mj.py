@@ -1,4 +1,7 @@
 # Based on https://github.com/bdaiinstitute/judo/tree/8d97cf588a8beab9ad9132ab4f6c0bf51e065fc5/judo/visualizers
+import pyinstrument
+import functools
+import sklearn
 import more_itertools
 from scipy import optimize
 import collections
@@ -730,7 +733,10 @@ MJ_MODEL_PATH = (
 
 from robot_descriptions import piper_mj_description
 
-spec = MjSpec.from_file(piper_mj_description.MJCF_PATH)
+# spec = MjSpec.from_file(piper_mj_description.MJCF_PATH)
+spec = MjSpec.from_file(
+    "/home/juruc/workspaces/r2_ws/r2/experimental/jafar/piper_meshes.xml"
+)
 model = spec.compile()
 data = MjData(model)
 server = ViserServer()
@@ -771,44 +777,44 @@ def get_joint_positions() -> np.ndarray:
     return joint_positions
 
 
-kp_slider = server.gui.add_slider(
-    label="Kp",
-    min=0.0,
-    max=10.0,
-    step=0.1,
-    initial_value=kp,
-)
-kd_slider = server.gui.add_slider(
-    label="Kd",
-    min=0.0,
-    max=10.0,
-    step=0.1,
-    initial_value=kd,
-)
-ki_slider = server.gui.add_slider(
-    label="Ki",
-    min=0.0,
-    max=1.0,
-    step=0.05,
-    initial_value=ki,
-)
-
-
-def kp_update_callback(event: viser.GuiEvent[viser.GuiSliderHandle]) -> None:
-    joint1_pid_controller.kp = event.target.value
-
-
-def kd_update_callback(event: viser.GuiEvent[viser.GuiSliderHandle]) -> None:
-    joint1_pid_controller.kd = event.target.value
-
-
-def ki_update_callback(event: viser.GuiEvent[viser.GuiSliderHandle]) -> None:
-    joint1_pid_controller.ki = event.target.value
-
-
-kp_slider.on_update(kp_update_callback)
-kd_slider.on_update(kd_update_callback)
-ki_slider.on_update(ki_update_callback)
+# kp_slider = server.gui.add_slider(
+#     label="Kp",
+#     min=0.0,
+#     max=10.0,
+#     step=0.1,
+#     initial_value=kp,
+# )
+# kd_slider = server.gui.add_slider(
+#     label="Kd",
+#     min=0.0,
+#     max=10.0,
+#     step=0.1,
+#     initial_value=kd,
+# )
+# ki_slider = server.gui.add_slider(
+#     label="Ki",
+#     min=0.0,
+#     max=1.0,
+#     step=0.05,
+#     initial_value=ki,
+# )
+#
+#
+# def kp_update_callback(event: viser.GuiEvent[viser.GuiSliderHandle]) -> None:
+#     joint1_pid_controller.kp = event.target.value
+#
+#
+# def kd_update_callback(event: viser.GuiEvent[viser.GuiSliderHandle]) -> None:
+#     joint1_pid_controller.kd = event.target.value
+#
+#
+# def ki_update_callback(event: viser.GuiEvent[viser.GuiSliderHandle]) -> None:
+#     joint1_pid_controller.ki = event.target.value
+#
+#
+# kp_slider.on_update(kp_update_callback)
+# kd_slider.on_update(kd_update_callback)
+# ki_slider.on_update(ki_update_callback)
 
 
 def slider_update_callback(event: viser.GuiEvent[viser.GuiSliderHandle]) -> None:
@@ -855,53 +861,55 @@ with server.gui.add_folder("Joint position control"):
     slider_handles = create_robot_control_sliders(server)
 
 
-output_uplot = server.gui.add_uplot(
-    data=(np.zeros(1000), np.zeros(1000)),
-    series=(
-        viser.uplot.Series(label="Time"),
-        viser.uplot.Series(
-            label="Output",
-            stroke=["green"],
-            width=1,
-        ),
-    ),
-    legend=viser.uplot.Legend(show=True),
-    scales={
-        "x": viser.uplot.Scale(
-            time=False,
-            auto=True,
-        ),
-    },
-    aspect=1.0,
-)
-uplot = server.gui.add_uplot(
-    data=(np.zeros(1000), np.zeros(1000), np.zeros(1000)),
-    series=(
-        viser.uplot.Series(label="Time"),
-        viser.uplot.Series(
-            label="Joint",
-            stroke=["red"],
-            width=1,
-        ),
-        viser.uplot.Series(
-            label="Target",
-            stroke=["green"],
-            width=1,
-        ),
-    ),
-    legend=viser.uplot.Legend(show=True),
-    scales={
-        "x": viser.uplot.Scale(
-            time=False,
-            auto=True,
-        ),
-        "y": viser.uplot.Scale(range=(-3.14, 3.14)),
-    },
-    aspect=1.0,
-)
+# output_uplot = server.gui.add_uplot(
+#     data=(np.zeros(1000), np.zeros(1000)),
+#     series=(
+#         viser.uplot.Series(label="Time"),
+#         viser.uplot.Series(
+#             label="Output",
+#             stroke=["green"],
+#             width=1,
+#         ),
+#     ),
+#     legend=viser.uplot.Legend(show=True),
+#     scales={
+#         "x": viser.uplot.Scale(
+#             time=False,
+#             auto=True,
+#         ),
+#     },
+#     aspect=1.0,
+# )
+# uplot = server.gui.add_uplot(
+#     data=(np.zeros(1000), np.zeros(1000), np.zeros(1000)),
+#     series=(
+#         viser.uplot.Series(label="Time"),
+#         viser.uplot.Series(
+#             label="Joint",
+#             stroke=["red"],
+#             width=1,
+#         ),
+#         viser.uplot.Series(
+#             label="Target",
+#             stroke=["green"],
+#             width=1,
+#         ),
+#     ),
+#     legend=viser.uplot.Legend(show=True),
+#     scales={
+#         "x": viser.uplot.Scale(
+#             time=False,
+#             auto=True,
+#         ),
+#         "y": viser.uplot.Scale(range=(-3.14, 3.14)),
+#     },
+#     aspect=1.0,
+# )
 
-robot = piper_interface.PiperInterface(can_port="can0")
-robot.set_installation_pos(piper_interface.ArmInstallationPos.UPRIGHT)
+print("Connecting to Piper robot...")
+robot = piper_interface.PiperInterface(can_port="arm_lon5_left")
+print("Connected to Piper robot.")
+robot.set_installation_pos(piper_interface.ArmInstallationPos.LEFT)
 piper_init.reset_arm(
     robot,
     arm_controller=piper_interface.ArmController.MIT,
@@ -912,14 +920,13 @@ current_joint_positions = robot.get_joint_positions()
 desired_joint_positions = current_joint_positions.copy()
 set_joint_positions(current_joint_positions)
 
-rate = loop_rate_limiters.RateLimiter(200)
+rate = loop_rate_limiters.RateLimiter(200, warn=False)
+
 # Move the arm joints using Mit mode controller.
 # while True:
 #     current_joint_positions = robot.get_joint_positions()
 #     set_joint_positions(current_joint_positions)
 #     rate.sleep()
-
-JOINT_INDEX = 4
 
 
 def tau_gravity(joint_positions):
@@ -961,7 +968,21 @@ def cubic_gravity_tau(sim_torque, a, b, c, d):
     )
 
 
-cubic_polynomial = []
+def linear_gravity_tau(sim_torque, a, b):
+    return a * sim_torque + b
+
+
+# cubic_polynomial = []
+# for joint_index in range(len(JOINT_NAMES)):
+#     opt_params = optimize.curve_fit(
+#         cubic_gravity_tau,
+#         mj_gravity_compenstation_torques[:, joint_index],
+#         gravity_compenstation_torques[:, joint_index],
+#         p0=[0.0, 0.0, 1.0, 0.0],
+#     )
+#     cubic_polynomial.append(opt_params[0])
+
+cubic_models = []
 for joint_index in range(len(JOINT_NAMES)):
     opt_params = optimize.curve_fit(
         cubic_gravity_tau,
@@ -969,52 +990,154 @@ for joint_index in range(len(JOINT_NAMES)):
         gravity_compenstation_torques[:, joint_index],
         p0=[0.0, 0.0, 1.0, 0.0],
     )
-    cubic_polynomial.append(opt_params[0])
+    a, b, c, d = opt_params[0]
+    cubic_models.append(functools.partial(cubic_gravity_tau, a=a, b=b, c=c, d=d))
+
+linear_models = []
+for joint_index in range(len(JOINT_NAMES)):
+    opt_params = optimize.curve_fit(
+        linear_gravity_tau,
+        mj_gravity_compenstation_torques[:, joint_index],
+        gravity_compenstation_torques[:, joint_index],
+        p0=[1.0, 0.0],
+    )
+    a, b = opt_params[0]
+    linear_models.append(functools.partial(linear_gravity_tau, a=a, b=b))
+
+
+rf_models = []
+for joint_index in range(len(JOINT_NAMES)):
+    rf_model = sklearn.ensemble.RandomForestRegressor(n_estimators=10)
+    rf_model.fit(
+        mj_gravity_compenstation_torques, gravity_compenstation_torques[:, joint_index]
+    )
+    rf_models.append(rf_model)
+
+
+def calculate_linear_gravity_tau(joint_positions):
+    assert len(joint_positions) == len(JOINT_NAMES)
+    mj_tau_gravity = tau_gravity(joint_positions)
+    return np.array(
+        [
+            linear_models[joint_index](mj_tau_gravity[joint_index])
+            for joint_index in range(len(JOINT_NAMES))
+        ]
+    )
+
+
+def calculate_cubic_gravity_tau(joint_positions):
+    """Calculate the gravity compensation torques using the cubic model."""
+    assert len(joint_positions) == len(JOINT_NAMES)
+    mj_tau_gravity = tau_gravity(joint_positions)
+    return np.array(
+        [
+            cubic_models[joint_index](mj_tau_gravity[joint_index])
+            for joint_index in range(len(JOINT_NAMES))
+        ]
+    )
+
+
+def calculate_rf_gravity_tau(joint_positions):
+    """Calculate the gravity compensation torques using the random forest model."""
+    assert len(joint_positions) == len(JOINT_NAMES)
+    mj_tau_gravity = tau_gravity(joint_positions)
+    return np.array(
+        [
+            rf_models[joint_index].predict(mj_tau_gravity.reshape(1, -1)).item()
+            for joint_index in range(len(JOINT_NAMES))
+        ]
+    )
+
+
+desired_joint_torques = np.zeros(len(JOINT_NAMES))
+joint_torque_slider_handles: list[viser.GuiInputHandle[float]] = []
+
+min_torques = gravity_compenstation_torques.min(axis=0)
+max_torques = gravity_compenstation_torques.max(axis=0)
+
+def joint_torque_slider_update_callback(
+    event: viser.GuiEvent[viser.GuiSliderHandle],
+) -> None:
+    global desired_joint_torques
+    joint_torques = np.zeros(len(JOINT_NAMES))
+    joint_idx = model.joint(event.target.label).id
+    joint_dof_idx = model.jnt_dofadr[joint_idx]
+    joint_torques[joint_dof_idx] = event.target.value
+    desired_joint_torques = np.clip(
+        joint_torques, min_torques, max_torques
+    )  # Ensure torques are within limits
+
+
+with server.gui.add_folder("Joint torques"):
+    for joint_name, min_torque, max_torque in zip(
+        JOINT_NAMES, min_torques, max_torques
+    ):
+        joint_idx = model.joint(joint_name).id
+        joint_qpos_idx = model.jnt_qposadr[joint_idx]
+        slider = server.gui.add_slider(
+            label=joint_name,
+            min=min_torque,
+            max=max_torque,
+            step=1e-3,
+            initial_value=0.0,
+        )
+        slider.on_update(joint_torque_slider_update_callback)
+        joint_torque_slider_handles.append(slider)
 
 output_plot_data = collections.deque(maxlen=1000)
 plot_data = collections.deque(maxlen=1000)
 plot_time = np.arange(0, 1000)
+# profiler = pyinstrument.Profiler()
+# profiler.start()
 with piper_control.MitJointPositionController(
     robot,
     kp_gains=10.0,
     kd_gains=0.8,
     rest_position=np.zeros(len(JOINT_NAMES)),
 ) as controller:
-    while True:
-        # joint1_pid_controller.set_target(desired_joint_positions[JOINT_INDEX])
-        current_joint_positions = robot.get_joint_positions()
-        # plot_data.append(current_joint_positions[JOINT_INDEX])
-        set_joint_positions(current_joint_positions)
-        # output = joint1_pid_controller.compute(current_joint_positions[JOINT_INDEX])
-        # commanded_joint_torques = np.zeros(len(JOINT_NAMES))
-        # commanded_joint_torques[JOINT_INDEX] = output
-        mj_gravity_compenstation_torques = tau_gravity(current_joint_positions)
-        commanded_joint_torques = [
-            cubic_gravity_tau(
-                mj_gravity_compenstation_torques[JOINT_INDEX],
-                *cubic_polynomial[JOINT_INDEX],
-            )
-            for i in range(len(mj_gravity_compenstation_torques))
-        ]
-        controller.command_torques(commanded_joint_torques)
-        # output_plot_data.append(output)
-        # output_uplot.data = (
-        #     plot_time,
-        #     np.asarray(output_plot_data),
-        # )
-        # uplot.data = (
-        #     plot_time,
-        #     np.asarray(plot_data),
-        #     np.full(len(plot_data), desired_joint_positions[JOINT_INDEX]),
-        # )
-        # grav_torque_sampler = GravityTorqueSampler(
-        #     robot,
-        #     controller,
-        #     desired_joint_positions,
-        #     p_gains=np.array([3.0, 15.0, 12.0, 3.0, 3.0, 2.0]),
-        #     d_gains=np.array([3.0, 3.0, 3.0, 2.0, 2.0, 2.0]),
-        # )
-        #
-        # grav_torque_sampler.sample()
-        # current_joint_positions = robot.get_joint_positions()
-        rate.sleep()
+    try:
+        while True:
+            # joint1_pid_controller.set_target(desired_joint_positions[JOINT_INDEX])
+            current_joint_positions = robot.get_joint_positions()
+            # plot_data.append(current_joint_positions[JOINT_INDEX])
+            set_joint_positions(current_joint_positions)
+            # output = joint1_pid_controller.compute(current_joint_positions[JOINT_INDEX])
+            # commanded_joint_torques = np.zeros(len(JOINT_NAMES))
+            # commanded_joint_torques[JOINT_INDEX] = output
+            # mj_gravity_compenstation_torques = tau_gravity(current_joint_positions)
+            # commanded_joint_torques = [
+            #     cubic_gravity_tau(
+            #         mj_gravity_compenstation_torques[JOINT_INDEX],
+            #         *cubic_polynomial[JOINT_INDEX],
+            #     )
+            #     for i in range(len(mj_gravity_compenstation_torques))
+            # ]
+            # commanded_joint_torques = calculate_cubic_gravity_tau(current_joint_positions)
+            # commanded_joint_torques = calculate_rf_gravity_tau(current_joint_positions)
+            # commanded_joint_torques = calculate_cubic_gravity_tau(current_joint_positions)
+            controller.command_torques(desired_joint_torques)
+            # output_plot_data.append(output)
+            # output_uplot.data = (
+            #     plot_time,
+            #     np.asarray(output_plot_data),
+            # )
+            # uplot.data = (
+            #     plot_time,
+            #     np.asarray(plot_data),
+            #     np.full(len(plot_data), desired_joint_positions[JOINT_INDEX]),
+            # )
+            # grav_torque_sampler = GravityTorqueSampler(
+            #     robot,
+            #     controller,
+            #     desired_joint_positions,
+            #     p_gains=np.array([3.0, 15.0, 12.0, 3.0, 3.0, 2.0]),
+            #     d_gains=np.array([3.0, 3.0, 3.0, 2.0, 2.0, 2.0]),
+            # )
+            #
+            # grav_torque_sampler.sample()
+            # current_joint_positions = robot.get_joint_positions()
+            rate.sleep()
+    except KeyboardInterrupt:
+        print("Keyboard interrupt received, stopping controller.")
+        # profiler.stop()
+        # profiler.write_html("bench.html")
