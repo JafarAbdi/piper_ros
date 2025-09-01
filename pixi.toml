@@ -5,8 +5,13 @@ name      = "piper_ros"
 platforms = ["linux-64"]
 version   = "0.1.0"
 
+[activation.env]
+RMW_IMPLEMENTATION            = "rmw_cyclonedds_cpp"
+ROS_AUTOMATIC_DISCOVERY_RANGE = "LOCALHOST"
+
+# AMENT_PREFIX_PATH = "$AMENT_PREFIX_PATH:$PIXI_PROJECT_ROOT/src/testing"
 [activation]
-env = { RMW_IMPLEMENTATION = "rmw_cyclonedds_cpp", ROS_AUTOMATIC_DISCOVERY_RANGE = "LOCALHOST" }
+scripts = ["env.sh"]
 
 [tasks]
 
@@ -22,8 +27,10 @@ piper_control_ros2      = { path = "src/piper_control_ros2", editable = true }
 piper_puppeteering_node = { path = "src/piper_puppeteering_node", editable = true }
 piper_sdk               = { git = "https://github.com/JafarAbdi/piper_sdk", branch = "master" }
 python-can              = { version = ">=3.0.0,<4" }
-more-itertools = ">=10.7.0, <11"
-pyinstrument = ">=5.1.1, <6"
+more-itertools          = ">=10.7.0, <11"
+pyinstrument            = ">=5.1.1, <6"
+testing                 = { path = "src/testing", editable = true }
+jafar_testing           = { path = "src/jafar_testing", editable = true }
 
 [pypi-options.dependency-overrides]
 # piper_control & ROS 2 depend on numpy<2

@@ -1,0 +1,24 @@
+[project]
+name = "testing"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "JafarAbdi", email = "jafar.uruc@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+jafar_testin = "testing:main"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.data-files]
+"share/ament_index/resource_index/packages" = ["resource/testing"]
+"share/testing" = ["package.xml"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"

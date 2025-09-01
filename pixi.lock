@@ -855,8 +855,10 @@ environments:
       - pypi: https://files.pythonhosted.org/packages/11/a7/81dba5010f7e733de88af9555725146fc133be97ce36533867f4c7e75066/xxhash-3.5.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl
       - pypi: https://files.pythonhosted.org/packages/fa/e1/ab7086ffc2767455a28848945ddacce1533d67ad26c20a4a01c93d0ea239/yourdfpy-0.0.58-py3-none-any.whl
       - pypi: ./
+      - pypi: ./src/jafar_testing
       - pypi: ./src/piper_control_ros2
       - pypi: ./src/piper_puppeteering_node
+      - pypi: ./src/testing
 packages:
 - conda: https://conda.anaconda.org/conda-forge/linux-64/_libgcc_mutex-0.1-conda_forge.tar.bz2
   sha256: fe51de6107f9edc7aa4f786a70f4a883943bc9d39b3bb7307c04c41410990726
@@ -3061,6 +3063,13 @@ packages:
   version: 2.2.0
   sha256: c6242fc49e35958c8b15141343aa660db5fc54d4f13a1db01a3f5891b98700ef
   requires_python: '>=3.8'
+- pypi: ./src/jafar_testing
+  name: jafar-testing
+  version: 0.0.0
+  sha256: abf9dc5b76b9f3e518b9a66d67d8f434f126b3ca4b109c90e191129c851ab544
+  requires_dist:
+  - setuptools
+  editable: true
 - conda: https://conda.anaconda.org/conda-forge/linux-64/jasper-4.2.8-he3c4edf_0.conda
   sha256: 0e919ec86d980901d8cbb665e91f5e9bddb5ff662178f25aed6d63f999fd9afc
   md5: a04073db11c2c86c555fb088acc8f8c1
@@ -6104,7 +6113,7 @@ packages:
 - pypi: ./src/piper_control_ros2
   name: piper-control-ros2
   version: 0.0.0
-  sha256: 6ed06447f877c9168b3b5f754a45ca2f58fb7bc3bd49ffc668fc8716708e2d5f
+  sha256: 78027ce60b904b9590f56c48bf541a62b15446c6abec6baa6376378d430f28b3
   requires_dist:
   - setuptools
   editable: true
@@ -14139,6 +14148,12 @@ packages:
   - mypy~=1.6 ; extra == 'typing'
   - traitlets>=5.11.1 ; extra == 'typing'
   requires_python: '>=3.8'
+- pypi: ./src/testing
+  name: testing
+  version: 0.1.0
+  sha256: 35258a77b3feb84d563c3cd82544fb7f5ba80220ed3795f708158ee20dcf9799
+  requires_python: '>=3.12'
+  editable: true
 - pypi: https://files.pythonhosted.org/packages/32/d5/f9a850d79b0851d1d4ef6456097579a9005b31fea68726a4ae5f2d82ddd9/threadpoolctl-3.6.0-py3-none-any.whl
   name: threadpoolctl
   version: 3.6.0
